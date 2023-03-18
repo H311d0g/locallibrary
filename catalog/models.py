@@ -25,7 +25,7 @@ class Book(models.Model):
     summary = models.TextField(max_length=1000, help_text='Enter a brief description of the book')
     isbn = models.CharField('ISBN', max_length=13, unique=True, help_text='13 Character <a href="https://www.isbn-international.org/content/what-isbn">ISBN number</a>')
     genre = models.ManyToManyField(Genre, help_text='Select a genre for this book')
-    
+    language = models.ForeignKey(Language, on_delete=models.SET_NULL, null=True)
     def __str__(self):
         """String to represent the Model object"""
         return self.title
@@ -33,6 +33,10 @@ class Book(models.Model):
     def get_absolute_url(self):
         """Returns the URL to acces a detail record for this book"""
         return reverse('book-detail', args=[str(self.id)])
+    def display_genre(self):
+        return ', '.join(genre.name for genre in self.genre.all()[:3])
+    display_genre.short_description = 'Genre'
+
 
 class BookInstance(models.Model):
     """Model representing a specific copy of a book (i.e that cna be borrowed from the library)"""
@@ -77,6 +81,6 @@ class Author(models.Model):
         return reverse('author-detail', args=[str(self.id)])
     def __str__(self):
         """String for representing the Model object."""
-        return f'{self.las_name}, {self.first_name}'
+        return f'{self.last_name}, {self.first_name}'
     
     
